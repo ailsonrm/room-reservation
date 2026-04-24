@@ -1,0 +1,138 @@
+{
+	"info": {
+		"_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+		"name": "Room Reservation API",
+		"description": "Coleção para a API de reservas de salas (Spring Boot).\n\n**Base:** `{{baseUrl}}` — padrão `http://localhost:8080`.\n\nVariáveis da coleção: `baseUrl`, `salaId`, `reservaId`.\n\nRegras: `inicio` deve ser **estritamente no futuro** em relação ao servidor; intervalos não podem se sobrepor na mesma sala.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080"
+		},
+		{
+			"key": "salaId",
+			"value": "A1"
+		},
+		{
+			"key": "reservaId",
+			"value": "1"
+		}
+	],
+	"item": [
+		{
+			"name": "Reservas",
+			"item": [
+				{
+					"name": "Criar reserva",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"salaId\": \"{{salaId}}\",\n  \"usuarioId\": \"user1\",\n  \"inicio\": \"2026-12-01T14:00:00\",\n  \"fim\": \"2026-12-01T15:00:00\"\n}"
+						},
+						"url": "{{baseUrl}}/reservas",
+						"description": "Cria uma reserva. Respostas típicas: **201** sucesso (texto), **400** validação, **409** conflito de horário na sala."
+					},
+					"response": []
+				},
+				{
+					"name": "Listar todas as reservas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{baseUrl}}/reservas",
+						"description": "Retorna array JSON de todas as reservas (pode ser `[]`)."
+					},
+					"response": []
+				},
+				{
+					"name": "Listar reservas por sala",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{baseUrl}}/reservas/{{salaId}}",
+						"description": "`{salaId}` é o código da sala (ex.: A1), não o id numérico da reserva."
+					},
+					"response": []
+				},
+				{
+					"name": "Excluir reserva por id",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": "{{baseUrl}}/reservas/{{reservaId}}",
+						"description": "Remove pelo **id** persistido da entidade. **204** sem corpo se ok; **404** se não existir; **400** se id inválido."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Cenários (validação e conflito)",
+			"item": [
+				{
+					"name": "Criar reserva — fim antes do início (esperar 400)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"salaId\": \"{{salaId}}\",\n  \"usuarioId\": \"user1\",\n  \"inicio\": \"2026-12-01T16:00:00\",\n  \"fim\": \"2026-12-01T14:00:00\"\n}"
+						},
+						"url": "{{baseUrl}}/reservas"
+					},
+					"response": []
+				},
+				{
+					"name": "Criar reserva — início no passado (esperar 400)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"salaId\": \"{{salaId}}\",\n  \"usuarioId\": \"user1\",\n  \"inicio\": \"2020-01-01T10:00:00\",\n  \"fim\": \"2020-01-01T11:00:00\"\n}"
+						},
+						"url": "{{baseUrl}}/reservas"
+					},
+					"response": []
+				},
+				{
+					"name": "Criar reserva — sobrepõe horário existente (esperar 409)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"salaId\": \"{{salaId}}\",\n  \"usuarioId\": \"user2\",\n  \"inicio\": \"2026-12-01T14:30:00\",\n  \"fim\": \"2026-12-01T15:30:00\"\n}"
+						},
+						"url": "{{baseUrl}}/reservas",
+						"description": "Execute depois de **Criar reserva** com o mesmo `salaId` e janela 14:00–15:00 para forçar sobreposição."
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
