@@ -2,6 +2,10 @@
 
 > REST API para gerenciamento de reservas de salas de reunião, com validação de regras de negócio e prevenção de conflitos de agenda.
 
+![Collection Postman](assets/print1.png)
+![RUN App Intellij](assets/print2.png)
+![H2 Console](assets/print3.png)
+
 ---
 
 ## 🚀 Sobre o projeto
